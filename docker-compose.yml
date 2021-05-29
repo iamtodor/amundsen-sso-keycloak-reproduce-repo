@@ -1,0 +1,99 @@
+version: '3'
+services:
+  neo4j:
+    image: neo4j:3.5.26
+    container_name: neo4j_amundsen
+    environment:
+      - NEO4J_AUTH=neo4j/test
+    ulimits:
+      nofile:
+        soft: 40000
+        hard: 40000
+    ports:
+      - 7474:7474
+      - 7687:7687
+    volumes:
+      - ./example/docker/neo4j/conf:/var/lib/neo4j/conf
+      - ./.local/neo4j/data:/data
+  #      networks:
+  #        - amundsennet
+  #      network_mode: host
+  elasticsearch:
+    image: elasticsearch:6.7.0
+    container_name: es_amundsen
+    ports:
+      - 9200:9200
+    #      networks:
+    #        - amundsennet
+    #      network_mode: host
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+    volumes:
+      - ./.local/elasticsearch/data:/usr/share/elasticsearch/data
+  amundsensearch:
+    image: amundsendev/amundsen-search:latest
+    container_name: amundsensearch
+    ports:
+      - 5001:5001
+    depends_on:
+      - elasticsearch
+    #      networks:
+    #        - amundsennet
+    #      network_mode: host
+    environment:
+      - PROXY_ENDPOINT=es_amundsen
+  amundsenmetadata:
+    build:
+      context: ./
+      dockerfile: metadata.Dockerfile
+    container_name: amundsenmetadata
+    depends_on:
+      - neo4j
+    ports:
+      - 5002:5002
+    #      networks:
+    #        - amundsennet
+    #      network_mode: host
+    environment:
+      - PROXY_HOST=bolt://neo4j_amundsen
+      - FLASK_APP_MODULE_NAME=flaskoidc
+      - FLASK_APP_CLASS_NAME=FlaskOIDC
+      - FLASK_OIDC_WHITELISTED_ENDPOINTS=api.healthcheck
+  amundsenfrontend:
+    build:
+      args:
+        SEARCHSERVICE_BASE: http://amundsensearch:5001
+        METADATASERVICE_BASE: http://amundsenmetadata:5002
+      context: ./
+      dockerfile: frontend.Dockerfile
+    #      image: my-amundsen-frontend-oidc
+    container_name: amundsenfrontend
+    depends_on:
+      - amundsenmetadata
+      - amundsensearch
+    ports:
+      - 5000:5000
+    #      networks:
+    #        - amundsennet
+    #      network_mode: host
+    environment:
+      - SEARCHSERVICE_BASE=http://amundsensearch:5001
+      - METADATASERVICE_BASE=http://amundsenmetadata:5002
+      - FLASK_APP_MODULE_NAME=flaskoidc
+      - FLASK_APP_CLASS_NAME=FlaskOIDC
+      - FRONTEND_SVC_CONFIG_MODULE_CLASS=amundsen_application.oidc_config.OidcConfig
+      - APP_WRAPPER=flaskoidc
+      - APP_WRAPPER_CLASS=FlaskOIDC
+      - SQLALCHEMY_DATABASE_URI=sqlite:///sessions.db
+      - SESSION_TYPE=sqlalchemy
+      - FLASK_OIDC_LOG_DATE_FORMAT=%Y-%m-%dT%H:%M:%S%z
+      - FLASK_OIDC_LOG_LEVEL=DEBUG
+      - OIDC_CLOCK_SKEW=560 # https://stackoverflow.com/questions/53477760/flask-oidc-with-keycloak-oidc-callback-default-callback-not-working
+
+#networks:
+#  amundsennet:
+#  default:
+#    external: true
+#    name: my_amundsen

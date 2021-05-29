@@ -1,0 +1,18 @@
+{
+  "web": {
+    "issuer": "http://localhost:8080/auth/realms/master",
+    "issuer_admin": "http://localhost:8080/auth/admin/realms/master",
+    "auth_uri": "http://localhost:8080/auth/realms/master/protocol/openid-connect/auth",
+    "client_id": "amundsen-frontend",
+    "client_secret": "2c789fcb-0b6a-4c56-b571-3cb0cc342b0a",
+    "userinfo_uri": "http://localhost:8080/auth/realms/master/protocol/openid-connect/userinfo",
+    "token_uri": "http://localhost:8080/auth/realms/master/protocol/openid-connect/token",
+    "token_introspection_uri": "http://localhost:8080/auth/realms/master/protocol/openid-connect/token/introspect",
+    "redirectUris": [
+      "http://localhost:5000/*",
+      "http://localhost:5000/oidc_callback",
+      "http://0.0.0.0:5000/*",
+      "http://0.0.0.0:5000/oidc_callback"
+    ]
+  }
+}
