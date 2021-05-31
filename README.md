@@ -53,6 +53,3 @@ Traceback (most recent call last):
     self.sock.connect((self.host, self.port) + sa[2:])
 OSError: [Errno 99] Cannot assign requested address
 ```
-
-user
-user
