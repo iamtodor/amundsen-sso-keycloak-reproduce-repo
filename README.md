@@ -3,17 +3,13 @@
 To reproduce the issue:
 1. Run `docker run --hostname host -p 8080:8080 -e KEYCLOAK_USER=admin -e KEYCLOAK_PASSWORD=admin quay.io/keycloak/keycloak:13.0.1`
 2. login to `http://localhost:8080/auth/admin` with admin/admin
-3. Setup authentication as it described here https://nirav-langaliya.medium.com/setup-oidc-authentication-with-lyft-amundsen-via-okta-eb0b89d724d3
-with keycloak integration:
-   - client id: amundsen-frontend
-   - client protocol: openid-connect
-   - access type: confidential
-   - valid Redirect URIs : http://localhost:5000/*
-   - Base URL : http://localhost:5000/
-4. Create new user
+3. Create the client from the config file `keycloak-amundsen-frontend-client.json`
+4. Create new user as it described here https://nirav-langaliya.medium.com/setup-oidc-authentication-with-lyft-amundsen-via-okta-eb0b89d724d3
+with keycloak integration
 5. Copy your newly generated secret to:
    - `cloak/keycloak.json/client_secret`
    - `frontend.Dockerfile/FLASK_OIDC_SECRET_KEY`
+   - `metadata.Dockerfile/FLASK_OIDC_SECRET_KEY`
 6. run `docker-compose -f docker-compose.yml up`
 7. open `http://localhost:5000/`
 8. login with previously created user in step #4
@@ -57,3 +53,6 @@ Traceback (most recent call last):
     self.sock.connect((self.host, self.port) + sa[2:])
 OSError: [Errno 99] Cannot assign requested address
 ```
+
+user
+user
