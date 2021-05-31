@@ -1,6 +1,6 @@
 FROM amundsendev/amundsen-frontend-oidc:latest
 
-COPY /cloak /cloak
+COPY keycloak-oidc.json keycloak-oidc.json
 
 ENV FLASK_APP_MODULE_NAME flaskoidc
 ENV FLASK_APP_CLASS_NAME FlaskOIDC
@@ -24,4 +24,4 @@ ENV FLASK_OIDC_WHITELISTED_ENDPOINTS "status,healthcheck,health"
 ENV FLASK_OIDC_LOG_DATE_FORMAT '%Y-%m-%dT%H:%M:%S%z'
 ENV FLASK_OIDC_LOG_LEVEL 'INFO'
 
-ENV OIDC_CLIENT_SECRETS '/cloak/keycloak.json'
+ENV OIDC_CLIENT_SECRETS 'keycloak-oidc.json'
